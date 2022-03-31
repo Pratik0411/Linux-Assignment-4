@@ -1,44 +1,42 @@
 #include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
 #include<pthread.h>
+#include<unistd.h>
 
-struct data
+struct my_thread
 {
-	int i;
-	char g;
-	char c[40];
+	int thread_id;
+	char mesg[100];
 };
 
-void* structure(void *param)
+void *PrintHello(void *threadobj)
 {
-	struct data *s;
-	s = (struct data *) param;
-	printf("Structure data: \t Name: %s \t Age= %i \t Gender: %c\n", s->c,	s->i, s->g);
-	return NULL;
+	pthread_t thread_ID;
+	struct my_thread *t1;
+	t1 = (struct my_thread *) threadobj;
+	thread_ID = pthread_self();
+	printf("\n Thread Id : %u\n",thread_ID);
+	printf("\n %d Thread message :%s\n",t1->thread_id,t1->mesg);
 }
 
 int main()
 {
-	pthread_t thread1;
-	pthread_t thread2;
-
-	struct data thread1_args;
-	struct data thread2_args;
-
-	pthread_create(&thread1, NULL, structure, (void *)&thread1_args);
-	pthread_create(&thread2, NULL, structure, (void *)&thread2_args);
-
-	thread1_args.i = 21;
-	strcpy(thread1_args.c, "Amey Sone\n");
-	thread1_args.g = 'M';
-
-	thread2_args.i = 21;
-	strcpy(thread2_args.c, "ABC\n");
-	thread2_args.g = 'F';
-
-	pthread_join(thread1, NULL);
-	pthread_join(thread2, NULL);
-
-	return 0;
+	pthread_t thread2,thread3,thread4,thread_ID;
+	int rc;
+	struct my_thread t2,t3,t4;
+	t4.thread_id = 4;
+	strcpy(t4.mesg,"I am forth thread\n");
+	t2.thread_id=2;
+	strcpy(t2.mesg,"I am second thread\n");
+	t3.thread_id=3;
+	strcpy(t3.mesg,"I am third thread\n");
+	
+	thread_ID = pthread_self();
+	printf("\n Main thread ID : %u",thread_ID);
+	
+	pthread_create(&thread4,NULL,PrintHello,(void *)&t4);
+	pthread_create(&thread4,NULL,PrintHello,(void *)&t2);
+	pthread_create(&thread4,NULL,PrintHello,(void *)&t3);
+	
+	printf("\n exit from main thread");
+	pthread_exit(NULL);
 }
